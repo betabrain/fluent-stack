@@ -10,6 +10,8 @@ sealed class Stack4<A, B, C, D> {
   open fun rethrow() {}
   open fun tos(): D = throw TopOfStackException()
   abstract fun swap(): Stack4<A, B, D, C>
+  abstract fun dup(): Stack5<A, B, C, D, D>
+  abstract fun dip(): Stack5<A, B, C, D, C>
 
   class Okay<A, B, C, D>(private val v1: A, private val v2: B, private val v3: C, private val v4: D) :
     Stack4<A, B, C, D>() {
@@ -49,6 +51,8 @@ sealed class Stack4<A, B, C, D> {
 
     override fun tos() = v4
     override fun swap(): Stack4<A, B, D, C> = Okay(v1, v2, v4, v3)
+    override fun dup(): Stack5<A, B, C, D, D> = Stack5.Okay(v1, v2, v3, v4, v4)
+    override fun dip(): Stack5<A, B, C, D, C> = Stack5.Okay(v1, v2, v3, v4, v3)
   }
 
   class Error<A, B, C, D>(private val ex: Exception) : Stack4<A, B, C, D>() {
@@ -60,5 +64,7 @@ sealed class Stack4<A, B, C, D> {
     override fun <E> map(m: Mapper4<A, B, C, D, E>): Stack1<E> = Stack1.Error(ex)
     override fun rethrow() = throw RethrowException(ex)
     override fun swap(): Stack4<A, B, D, C> = Error(ex)
+    override fun dup(): Stack5<A, B, C, D, D> = Stack5.Error(ex)
+    override fun dip(): Stack5<A, B, C, D, C> = Stack5.Error(ex)
   }
 }
