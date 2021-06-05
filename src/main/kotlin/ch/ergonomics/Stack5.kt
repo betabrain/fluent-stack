@@ -3,6 +3,7 @@ package ch.ergonomics
 sealed class Stack5<A, B, C, D, E> {
   abstract fun drop(): Stack4<A, B, C, D>
   abstract fun <F> push(v: F): Stack6<A, B, C, D, E, F>
+  abstract fun <F> push(supplier: Supplier<F>): Stack6<A, B, C, D, E, F>
   abstract fun <F> map(m: Mapper1<E, F>): Stack5<A, B, C, D, F>
   abstract fun <F> map(m: Mapper2<D, E, F>): Stack4<A, B, C, F>
   abstract fun <F> map(m: Mapper3<C, D, E, F>): Stack3<A, B, F>
@@ -24,6 +25,14 @@ sealed class Stack5<A, B, C, D, E> {
     Stack5<A, B, C, D, E>() {
     override fun drop(): Stack4<A, B, C, D> = Stack4.Okay(v1, v2, v3, v4)
     override fun <F> push(v: F): Stack6<A, B, C, D, E, F> = Stack6.Okay(v1, v2, v3, v4, v5, v)
+    override fun <F> push(supplier: Supplier<F>): Stack6<A, B, C, D, E, F> {
+      return try {
+        Stack6.Okay(v1, v2, v3, v4, v5, supplier.get())
+      } catch (ex: Exception) {
+        Stack6.Error(ex)
+      }
+    }
+
     override fun <F> map(m: Mapper1<E, F>): Stack5<A, B, C, D, F> {
       return try {
         Okay(v1, v2, v3, v4, m.invoke(v5))
@@ -73,6 +82,7 @@ sealed class Stack5<A, B, C, D, E> {
   class Error<A, B, C, D, E>(private val ex: Exception) : Stack5<A, B, C, D, E>() {
     override fun drop(): Stack4<A, B, C, D> = Stack4.Error(ex)
     override fun <F> push(v: F): Stack6<A, B, C, D, E, F> = Stack6.Error(ex)
+    override fun <F> push(supplier: Supplier<F>): Stack6<A, B, C, D, E, F> = Stack6.Error(ex)
     override fun <F> map(m: Mapper1<E, F>): Stack5<A, B, C, D, F> = Error(ex)
     override fun <F> map(m: Mapper2<D, E, F>): Stack4<A, B, C, F> = Stack4.Error(ex)
     override fun <F> map(m: Mapper3<C, D, E, F>): Stack3<A, B, F> = Stack3.Error(ex)

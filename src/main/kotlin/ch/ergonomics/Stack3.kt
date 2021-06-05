@@ -3,6 +3,7 @@ package ch.ergonomics
 sealed class Stack3<A, B, C> {
   abstract fun drop(): Stack2<A, B>
   abstract fun <D> push(v: D): Stack4<A, B, C, D>
+  abstract fun <D> push(supplier: Supplier<D>): Stack4<A, B, C, D>
   abstract fun <D> map(m: Mapper1<C, D>): Stack3<A, B, D>
   abstract fun <D> map(m: Mapper2<B, C, D>): Stack2<A, D>
   abstract fun <D> map(m: Mapper3<A, B, C, D>): Stack1<D>
@@ -15,6 +16,14 @@ sealed class Stack3<A, B, C> {
   class Okay<A, B, C>(private val v1: A, private val v2: B, private val v3: C) : Stack3<A, B, C>() {
     override fun drop(): Stack2<A, B> = Stack2.Okay(v1, v2)
     override fun <D> push(v: D): Stack4<A, B, C, D> = Stack4.Okay(v1, v2, v3, v)
+    override fun <D> push(supplier: Supplier<D>): Stack4<A, B, C, D> {
+      return try {
+        Stack4.Okay(v1, v2, v3, supplier.get())
+      } catch (ex: Exception) {
+        Stack4.Error(ex)
+      }
+    }
+
     override fun <D> map(m: Mapper1<C, D>): Stack3<A, B, D> {
       return try {
         Okay(v1, v2, m.invoke(v3))
@@ -48,6 +57,7 @@ sealed class Stack3<A, B, C> {
   class Error<A, B, C>(private val ex: Exception) : Stack3<A, B, C>() {
     override fun drop(): Stack2<A, B> = Stack2.Error(ex)
     override fun <D> push(v: D): Stack4<A, B, C, D> = Stack4.Error(ex)
+    override fun <D> push(supplier: Supplier<D>): Stack4<A, B, C, D> = Stack4.Error(ex)
     override fun <D> map(m: Mapper1<C, D>): Stack3<A, B, D> = Error(ex)
     override fun <D> map(m: Mapper2<B, C, D>): Stack2<A, D> = Stack2.Error(ex)
     override fun <D> map(m: Mapper3<A, B, C, D>): Stack1<D> = Stack1.Error(ex)
