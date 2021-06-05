@@ -3,7 +3,6 @@ package ch.ergonomics.tests;
 import ch.ergonomics.Fluent;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -20,15 +19,8 @@ public class Examples4 {
                     .uri(URI.create(uri))
                     .build();
 
-                HttpResponse<String> res = null;
-                try {
-                    res = HttpClient.newHttpClient()
-                        .send(req, HttpResponse.BodyHandlers.ofString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                HttpResponse<String> res = HttpClient.newHttpClient()
+                    .send(req, HttpResponse.BodyHandlers.ofString());
 
                 return res.body();
             })

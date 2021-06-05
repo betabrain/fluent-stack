@@ -10,6 +10,6 @@ sealed class Stack0 {
 
   class Error(private val ex: Exception) : Stack0() {
     override fun <A> push(v: A): Stack1<A> = Stack1.Error(ex)
-    override fun rethrow() = throw FluentException(ex)
+    override fun rethrow() = throw RethrowException(ex)
   }
 }
