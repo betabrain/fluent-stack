@@ -12,7 +12,7 @@ sealed class Stack5<A, B, C, D, E> {
   open fun tos(): E = throw TopOfStackException()
   abstract fun swap(): Stack5<A, B, C, E, D>
   abstract fun dup(): Stack6<A, B, C, D, E, E>
-  abstract fun dip(): Stack6<A, B, C, D, E, D>
+  abstract fun over(): Stack6<A, B, C, D, E, D>
 
   class Okay<A, B, C, D, E>(
     private val v1: A,
@@ -67,7 +67,7 @@ sealed class Stack5<A, B, C, D, E> {
     override fun tos() = v5
     override fun swap(): Stack5<A, B, C, E, D> = Okay(v1, v2, v3, v5, v4)
     override fun dup(): Stack6<A, B, C, D, E, E> = Stack6.Okay(v1, v2, v3, v4, v5, v5)
-    override fun dip(): Stack6<A, B, C, D, E, D> = Stack6.Okay(v1, v2, v3, v4, v5, v4)
+    override fun over(): Stack6<A, B, C, D, E, D> = Stack6.Okay(v1, v2, v3, v4, v5, v4)
   }
 
   class Error<A, B, C, D, E>(private val ex: Exception) : Stack5<A, B, C, D, E>() {
@@ -81,6 +81,6 @@ sealed class Stack5<A, B, C, D, E> {
     override fun rethrow() = throw RethrowException(ex)
     override fun swap(): Stack5<A, B, C, E, D> = Error(ex)
     override fun dup(): Stack6<A, B, C, D, E, E> = Stack6.Error(ex)
-    override fun dip(): Stack6<A, B, C, D, E, D> = Stack6.Error(ex)
+    override fun over(): Stack6<A, B, C, D, E, D> = Stack6.Error(ex)
   }
 }
