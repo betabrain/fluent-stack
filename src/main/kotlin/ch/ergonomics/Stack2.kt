@@ -7,6 +7,7 @@ sealed class Stack2<A, B> {
   abstract fun <C> map(m: Mapper2<A, B, C>): Stack1<C>
   open fun rethrow() {}
   open fun tos(): B = throw TopOfStackException()
+  abstract fun swap(): Stack2<B, A>
 
   class Okay<A, B>(private val v1: A, private val v2: B) : Stack2<A, B>() {
     override fun drop(): Stack1<A> = Stack1.Okay(v1)
@@ -28,6 +29,7 @@ sealed class Stack2<A, B> {
     }
 
     override fun tos() = v2
+    override fun swap(): Stack2<B, A> = Okay(v2, v1)
   }
 
   class Error<A, B>(private val ex: Exception) : Stack2<A, B>() {
@@ -36,5 +38,6 @@ sealed class Stack2<A, B> {
     override fun <C> map(m: Mapper1<B, C>): Stack2<A, C> = Error(ex)
     override fun <C> map(m: Mapper2<A, B, C>): Stack1<C> = Stack1.Error(ex)
     override fun rethrow() = throw RethrowException(ex)
+    override fun swap(): Stack2<B, A> = Error(ex)
   }
 }
